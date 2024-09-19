@@ -25,7 +25,11 @@ def main(page: ft.Page):
             )
             page.open(alerta)
         else:
-            valor_total = float(valor_altura.value) * float(valor_comprimento.value) * float(valor_largura.value) * page.client_storage.get("preco")
+            multiplcador_altura = 100 if dropdonw_altura.value == 'M' else 1
+            multiplcador_comprimento = 100 if dropdonw_comprimento.value == 'M' else 1
+            multiplcador_largura = 100 if dropdonw_largura.value == 'M' else 1
+
+            valor_total = float(int(valor_altura.value) * multiplcador_altura) * float(int(valor_comprimento.value) * multiplcador_comprimento) * float(int(valor_largura.value) * multiplcador_largura) * page.client_storage.get("preco")
             preco_calculado.value = f'R${valor_total:.2f}'
             preco_calculado.update()
 
@@ -41,7 +45,9 @@ def main(page: ft.Page):
             )
             page.open(alerta)
         else:
-            valor_total_area = float(valor_cm_quadadro.value) * float(valor_largura_cm_quadrado.value) * page.client_storage.get("preco")
+            multiplicador = 10000 if selecao_medida.value == 'M' else 1 
+            
+            valor_total_area = float(valor_cm_quadadro.value) * float(valor_largura_cm_quadrado.value) * page.client_storage.get("preco") * multiplicador
             preco_calculado_area.value = f'R${valor_total_area:.2f}'
             preco_calculado_area
             preco_calculado_area.update()
@@ -117,12 +123,40 @@ def main(page: ft.Page):
         height=45)
    
     ##HOME
-    valor_altura = ft.TextField(label="Altura em cm",keyboard_type=ft.KeyboardType.NUMBER, on_focus=limpa_texto, on_submit=acoes)
-    valor_comprimento = ft.TextField(label="Comprimento em cm",keyboard_type=ft.KeyboardType.NUMBER, on_focus=limpa_texto, on_submit=acoes)
-    valor_largura = ft.TextField(label="Largura em cm",keyboard_type=ft.KeyboardType.NUMBER, on_focus=limpa_texto, on_submit=calcular)
+    valor_altura = ft.TextField(label="Altura",keyboard_type=ft.KeyboardType.NUMBER, on_focus=limpa_texto, on_submit=acoes)
+    valor_comprimento = ft.TextField(label="Comprimento",keyboard_type=ft.KeyboardType.NUMBER, on_focus=limpa_texto, on_submit=acoes)
+    valor_largura = ft.TextField(label="Largura",keyboard_type=ft.KeyboardType.NUMBER, on_focus=limpa_texto, on_submit=calcular)
 
-    valor_cm_quadadro = ft.TextField(label="Área em cm²",keyboard_type=ft.KeyboardType.NUMBER, on_focus=limpa_texto, on_submit=acoes)
+    valor_cm_quadadro = ft.TextField(label="Área",keyboard_type=ft.KeyboardType.NUMBER, on_focus=limpa_texto, on_submit=acoes)
     valor_largura_cm_quadrado = ft.TextField(label="Largura em cm",keyboard_type=ft.KeyboardType.NUMBER, on_focus=limpa_texto, on_submit=calcular_area)
+
+    #dropdown
+    dropdonw_altura = ft.Dropdown(
+        value = "cm",
+        options=[
+            # ft.dropdown.Option("mm²"),
+            ft.dropdown.Option("cm"),
+            ft.dropdown.Option("M"),
+        ]
+    )
+
+    dropdonw_comprimento = ft.Dropdown(
+        value = "cm",
+        options=[
+            # ft.dropdown.Option("mm²"),
+            ft.dropdown.Option("cm"),
+            ft.dropdown.Option("M"),
+        ]
+    )
+
+    dropdonw_largura = ft.Dropdown(
+        value = "cm",
+        options=[
+            # ft.dropdown.Option("mm²"),
+            ft.dropdown.Option("cm"),
+            ft.dropdown.Option("M"),
+        ]
+    )
 
     #normal
     botao_calcular = ft.ElevatedButton(
@@ -152,8 +186,16 @@ def main(page: ft.Page):
         height=45)
     preco_calculado_area = ft.Text("",weight=ft.FontWeight.BOLD,size=30)
 
+    #dropdown
+    selecao_medida = ft.Dropdown(
+        value = "M",
+        options=[
+            # ft.dropdown.Option("mm²"),
+            ft.dropdown.Option("cm"),
+            ft.dropdown.Option("M"),
+        ]
+    )
     
-
     def route_change(route):
         print(page.views)
         # page.views.clear()
@@ -172,6 +214,7 @@ def main(page: ft.Page):
             page.views.append(
                 ft.View(
                     "/settings",
+                    scroll = ft.ScrollMode.HIDDEN,
                     controls=[
                         appbar_setting,
                         layout_settings,
@@ -195,17 +238,56 @@ def main(page: ft.Page):
             ft.ResponsiveRow(
                 [
                     ft.Container(
-                        valor_altura,
+                        content =ft.ResponsiveRow(
+                            controls=[
+                                ft.Container(
+                                    valor_altura,
+                                    padding= 0,
+                                    col={"xs":9,"sm":9, "md":9, "xl":9}
+                                ),
+                                ft.Container(
+                                    dropdonw_altura,
+                                    padding= 0,
+                                    col={"xs":3, "sm":3, "md":3, "xl":3}
+                                ),
+                            ]
+                        ),
                         padding= 5,
                         col={"sm":12, "md":3, "xl":3}
                     ),
                     ft.Container(
-                        valor_comprimento,
+                        content =ft.ResponsiveRow(
+                            controls=[
+                                ft.Container(
+                                    valor_comprimento,
+                                    padding= 0,
+                                    col={"xs":9,"sm":9, "md":9, "xl":9}
+                                ),
+                                ft.Container(
+                                    dropdonw_comprimento,
+                                    padding= 0,
+                                    col={"xs":3, "sm":3, "md":3, "xl":3}
+                                ),
+                            ]
+                        ),
                         padding= 5,
                         col={"sm":12, "md":3, "xl":3}
                     ),
                     ft.Container(
-                        valor_largura,
+                        content =ft.ResponsiveRow(
+                            controls=[
+                                ft.Container(
+                                    valor_largura,
+                                    padding= 0,
+                                    col={"xs":9,"sm":9, "md":9, "xl":9}
+                                ),
+                                ft.Container(
+                                    dropdonw_largura,
+                                    padding= 0,
+                                    col={"xs":3, "sm":3, "md":3, "xl":3}
+                                ),
+                            ]
+                        ),
                         padding= 5,
                         col={"sm":12, "md":3, "xl":3}
                     ),
@@ -225,12 +307,25 @@ def main(page: ft.Page):
                         ft.Text("Calculo placa", size=20),
                         alignment=ft.alignment.center,
                         padding= 5,
-                        col={"sm":12, "md":3, "xl":3}
+                        col={"sm":12, "md":2, "xl":2}
                     ),
                     ft.Container(
-                        valor_cm_quadadro,
+                        content =ft.ResponsiveRow(
+                            controls=[
+                                ft.Container(
+                                    valor_cm_quadadro,
+                                    padding= 0,
+                                    col={"xs":9,"sm":9, "md":9, "xl":9}
+                                ),
+                                ft.Container(
+                                    selecao_medida,
+                                    padding= 0,
+                                    col={"xs":3, "sm":3, "md":3, "xl":3}
+                                ),
+                            ]
+                        ),
                         padding= 5,
-                        col={"sm":12, "md":3, "xl":3}
+                        col={"sm":12, "md":4, "xl":4}
                     ),
                     ft.Container(
                         valor_largura_cm_quadrado,
@@ -265,7 +360,6 @@ def main(page: ft.Page):
 
     layout_settings = ft.Column(
         scroll=ft.ScrollMode.HIDDEN,
-        
         controls=[
             ft.ResponsiveRow(
                 [
@@ -338,5 +432,6 @@ def main(page: ft.Page):
 
     # page.add(layout)
 
+    print(selecao_medida.value)
 
 ft.app(target=main)
